@@ -5,10 +5,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token")); // 초기 로그인 상태 설정
 
-  /**
-   * ✅ 로그인 상태 업데이트 함수
-   * - 로그인, 로그아웃 시 `localStorage` 변경을 감지하여 즉시 상태를 업데이트함.
-   */
+  // 로그인 상태 업데이트
   useEffect(() => {
     const handleStorageChange = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
@@ -22,10 +19,7 @@ const Layout = () => {
     };
   }, []);
 
-  /**
-   * ✅ 로그아웃 함수
-   * - 토큰 삭제 후 로그인 상태 업데이트
-   */
+  // 로그아웃 함수
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false); // 상태 즉시 업데이트
@@ -34,13 +28,13 @@ const Layout = () => {
 
   return (
     <div>
-      {/* 🔹 네비게이션 바 */}
+      {/* 네비게이션 바 */}
       <nav className="bg-gray-800 text-white p-4 flex justify-between">
-        <h1 className="text-xl">MBTI 테스트</h1>
+        {/* 제목 클릭시 홈으로 이동 */}
+        <Link to="/" className="text-xl">MBTI 테스트</Link>
         <div>
-          <Link to="/" className="mr-4">홈</Link>
 
-          {/* 🔹 로그인 상태에 따라 네비게이션 변경 */}
+          {/* 로그인 상태에 따라 네비게이션 변경 */}
           {isLoggedIn ? (
             <>
               <Link to="/profile" className="mr-4">프로필</Link>
@@ -57,7 +51,7 @@ const Layout = () => {
         </div>
       </nav>
 
-      {/* 현재 페이지의 콘텐츠가 여기에 렌더링됨 */}
+      {/* 현재 페이지의 콘텐츠 렌더링 */}
       <main className="p-4">
         <Outlet />
       </main>

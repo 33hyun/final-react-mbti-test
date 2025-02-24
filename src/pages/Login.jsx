@@ -25,8 +25,8 @@ const Login = () => {
       window.dispatchEvent(new Event("storage"));
 
       console.log("로그인 성공", res); // 디버깅용 콘솔 로그
-      alert("로그인 성공! 프로필 페이지로 이동합니다."); // 성공 메시지 표시
-      navigate("/profile"); // 로그인 성공 후 프로필 페이지로 이동
+      alert("로그인 성공! 홈페이지로 이동합니다."); // 성공 메시지 표시
+      navigate("/"); // 로그인 성공 후 홈으로 이동
     } catch (err) {
       console.error("로그인 실패:", err.response?.data || err.message);
       alert(err.response?.data?.message || "로그인에 실패했습니다."); // 사용자에게 오류 메시지 표시
