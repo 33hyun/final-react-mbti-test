@@ -17,8 +17,14 @@ const Login = () => {
     try {
       // 로그인 API 호출
       const res = await login({ id, password });
+
       // 로그인 성공 시 accessToken을 localStorage에 저장
       localStorage.setItem("token", res.accessToken);
+
+      // 🔹 로그인 상태 변경 이벤트 발생 (네비게이션 바 업데이트)
+      window.dispatchEvent(new Event("storage"));
+
+      console.log("로그인 성공", res); // 디버깅용 콘솔 로그
       alert("로그인 성공! 프로필 페이지로 이동합니다."); // 성공 메시지 표시
       navigate("/profile"); // 로그인 성공 후 프로필 페이지로 이동
     } catch (err) {

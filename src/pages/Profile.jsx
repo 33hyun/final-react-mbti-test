@@ -5,7 +5,6 @@ import { getUserProfile, updateProfile } from "../api/auth"; // 프로필 관련
 const Profile = () => {
   const [user, setUser] = useState(null); // 사용자 정보 상태 관리
   const [nickname, setNickname] = useState(""); // 닉네임 변경을 위한 상태
-  const [avatar, setAvatar] = useState(null); // 프로필 이미지 상태
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,21 +27,12 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
-  // 로그아웃 함수
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   // 프로필 업데이트 함수
   const handleProfileUpdate = async () => {
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("nickname", nickname); // 닉네임 변경
-      if (avatar) {
-        formData.append("avatar", avatar); // 프로필 이미지 변경
-      }
       await updateProfile(formData, token);
       alert("프로필이 업데이트되었습니다.");
     } catch (err) {
@@ -64,19 +54,9 @@ const Profile = () => {
             onChange={(e) => setNickname(e.target.value)}
             className="border p-2"
           />
-          {/* 프로필 이미지 업로드 필드 */}
-          <input
-            type="file"
-            onChange={(e) => setAvatar(e.target.files[0])}
-            className="border p-2 mt-2"
-          />
           {/* 프로필 업데이트 버튼 */}
           <button onClick={handleProfileUpdate} className="bg-blue-500 text-white p-2 mt-2">
             프로필 업데이트
-          </button>
-          {/* 로그아웃 버튼 */}
-          <button onClick={handleLogout} className="bg-red-500 text-white p-2 mt-4">
-            로그아웃
           </button>
         </div>
       ) : (

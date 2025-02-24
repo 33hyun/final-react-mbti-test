@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Layout from "../components/Layout"; // Layout 추가
 import ProtectedRoute from "../ProtectedRoute";
 
 import Home from "../pages/Home";
@@ -9,11 +10,16 @@ import Profile from "../pages/Profile";
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/profile" element={<Profile />} />
+      {/* 🏠 모든 페이지에 Layout 적용 */}
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+
+        {/* 🔒 보호된 라우트 (로그인 필요) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="profile" element={<Profile />} />
+        </Route>
       </Route>
     </Routes>
   );
