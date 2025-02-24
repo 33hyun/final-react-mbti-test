@@ -8,8 +8,8 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import TestPage from "../pages/TestPage";
-import Result from "../pages/TestResultList";
-import Item from "../pages/TestResultItem" 
+import Result from "../pages/TestResultItem";
+import Item from "../pages/TestResultItem"  
 
 const AppRoutes = () => {
   return (

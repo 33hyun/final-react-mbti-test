@@ -1,38 +1,66 @@
-import { useEffect, useState } from "react";
-import PropTypes from 'prop-types';
-import { getTestResults } from "../api/testResult";
-import TestResultItem from "./TestResultItem";
+import PropTypes from "prop-types";
+import { deleteTestResult, updateTestResultVisibility } from "../api/testResult";
 
-const TestResultList = ({ userId }) => {
-  const [results, setResults] = useState([]);
+const TestResultItem = ({ result, isOwner }) => {
+  // result가 없을 경우, 안전하게 반환
+  if (!result || !result.mbti) {
+    return <p className="text-red-500">결과 데이터를 불러올 수 없습니다.</p>;
+  }
 
-  useEffect(() => {
-    const fetchResults = async () => {
+  const handleDelete = async () => {
+    if (window.confirm("정말 삭제하시겠습니까?")) {
       try {
-        const data = await getTestResults();
-        setResults(data);
+        await deleteTestResult(result.id);
+        window.location.reload(); // 새로고침하여 리스트 업데이트
       } catch (error) {
-        console.error("❌ 테스트 결과 가져오기 실패:", error);
+        console.error("❌ 삭제 실패:", error);
       }
-    };
-    fetchResults();
-  }, []);
+    }
+  };
+
+  const handleToggleVisibility = async () => {
+    try {
+      await updateTestResultVisibility(result.id, result.visibility);
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ 공개 여부 변경 실패:", error);
+    }
+  };
 
   return (
-    <div className="w-full max-w-lg mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4">테스트 결과 목록</h2>
-      {results.length > 0 ? (
-        results.map((result) => (
-          <TestResultItem key={result.id} result={result} isOwner={result.userId === userId} />
-        ))
-      ) : (
-        <p>저장된 테스트 결과가 없습니다.</p>
+    <div className="p-4 bg-gray-100 rounded-lg mb-3">
+      <h3 className="text-lg font-semibold">{result.mbti}</h3>
+      <p className="text-sm text-gray-700">{result.description || "설명 없음"}</p>
+
+      {isOwner && (
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={handleToggleVisibility}
+            className="px-3 py-1 bg-blue-500 text-white rounded"
+          >
+            {result.visibility ? "비공개" : "공개"}
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-3 py-1 bg-red-500 text-white rounded"
+          >
+            삭제
+          </button>
+        </div>
       )}
     </div>
   );
 };
-TestResultList.propTypes = {
-  userId: PropTypes.string.isRequired,
+
+// PropTypes 추가하여 result 객체 검증
+TestResultItem.propTypes = {
+  result: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    mbti: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    visibility: PropTypes.bool.isRequired,
+  }),
+  isOwner: PropTypes.bool,
 };
 
-export default TestResultList;
+export default TestResultItem;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PropTypes from "prop-types"; 
+import PropTypes, { number } from "prop-types"; 
 import { useNavigate } from "react-router-dom";
 import TestForm from "../components/TestForm";
 import { calculateMBTI, mbtiDescriptions } from "../utils/calculateMBTI";
@@ -43,7 +43,7 @@ const TestPage = ({ user }) => {
    */
   const handleNavigateToResults = () => {
     navigate("/results"); // 결과 페이지로 이동
-  };
+  };  
 
   return (
     <div className="w-full flex flex-col items-center justify-center bg-white">
@@ -79,7 +79,7 @@ const TestPage = ({ user }) => {
 // ✅ PropTypes 추가
 TestPage.propTypes = {
   user: PropTypes.shape({
-    id: PropTypes.number.isRequired, // 사용자 ID가 숫자 타입인지 확인
+    id: PropTypes.string|number.isRequired,
   }),
 };
 
