@@ -38,6 +38,8 @@ const Layout = () => {
           {isLoggedIn ? (
             <>
               <Link to="/profile" className="mr-4">프로필</Link>
+              <Link to="/test" className="mr-4">테스트</Link>
+              <Link to="/item" className="mr-4">결과</Link>
               <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">
                 로그아웃
               </button>
