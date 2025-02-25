@@ -1,33 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { getTestResults } from "../api/testResult";
 
 const ResultPage = () => {
   const { id } = useParams(); // URL에서 결과 ID 가져오기
   const navigate = useNavigate();
-  const [result, setResult] = useState(null);
 
-  /** ✅ 특정 테스트 결과 불러오기 */
+  // React Query를 사용해 테스트 결과 가져오기
+  const { data: results, isLoading, isError } = useQuery({
+    queryKey: ["testResults"],
+    queryFn: getTestResults, // 전체 테스트 결과 가져오기
+  });
+
+  // 특정 결과 찾기
+  const result = results?.find((r) => r.id === id);
+
+  // 결과를 찾을 수 없으면 목록 페이지로 이동
   useEffect(() => {
-    const fetchResult = async () => {
-      try {
-        const results = await getTestResults(); // 전체 결과 가져오기
-        const foundResult = results.find((r) => r.id === id); // 해당 ID의 결과 찾기
-        if (foundResult) {
-          setResult(foundResult);
-        } else {
-          alert("결과를 찾을 수 없습니다.");
-          navigate("/results"); // 결과 없으면 리스트 페이지로 이동
-        }
-      } catch (error) {
-        console.error("결과 불러오기 실패:", error);
-      }
-    };
+    if (!isLoading && results && !result) {
+      navigate("/results");
+    }
+  }, [result, isLoading, results, navigate]);
 
-    fetchResult();
-  }, [id, navigate]);
-
+  // 결과가 없을 경우에도 로딩 화면을 표시 (useEffect 실행 전)
   if (!result) return <p className="text-center mt-10">로딩 중...</p>;
+
+  // 데이터가 로딩 중이면 로딩 표시
+  if (isLoading) return <p className="text-center mt-10">로딩 중...</p>;
+
+  // 에러 발생 시 처리
+  if (isError) {
+    console.error("결과 불러오기 실패");
+    return <p className="text-center mt-10">결과를 불러오는 중 오류가 발생했습니다.</p>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">

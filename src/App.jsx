@@ -1,15 +1,18 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import AppRoutes from "./routes/AppRoutes";
-import './index.css';
+import "./index.css";
+
+// Query 설정
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}> 
+      <AuthProvider>
+          <AppRoutes />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
