@@ -1,51 +1,30 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserProfile, updateNickname } from "../api/auth"; // API 함수 가져오기
+import AuthContext from "../context/AuthContext"; // ✅ default import 사용
+import { getUserProfile } from "../api/auth";
 
 const Profile = () => {
-  const [user, setUser] = useState(null); // 사용자 정보 상태
-  const [nickname, setNickname] = useState(""); // 닉네임 변경 상태
+  const { user, setUser } = useContext(AuthContext);
+  const [nickname, setNickname] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token"); // 로컬 스토리지에서 JWT 토큰 가져오기
-
-      if (!token) {
-        console.warn("❌ 토큰 없음: 로그인 페이지로 이동");
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const res = await getUserProfile(); // API 호출 (토큰은 자동으로 포함됨)
-        setUser(res);
-        setNickname(res.nickname); // 기존 닉네임 저장
-      } catch (err) {
-        console.error("❌ 프로필 로드 실패:", err.response?.data || err.message);
-        navigate("/login"); // 실패 시 로그인 페이지로 이동
+      if (!user) {
+        try {
+          const res = await getUserProfile();
+          setUser(res);
+          setNickname(res.nickname);
+        } catch (err) {
+          console.error("❌ 프로필 불러오기 실패:", err.response?.data || err.message);
+          alert("인증이 만료되었습니다. 다시 로그인해주세요.");
+          navigate("/login");
+        }
       }
     };
 
     fetchProfile();
-  }, [navigate]);
-
-  // 닉네임 업데이트 함수
-  const handleNicknameUpdate = async () => {
-    if (!nickname.trim()) {
-      alert("닉네임을 입력해주세요.");
-      return;
-    }
-
-    try {
-      const updatedUser = await updateNickname({ nickname }); // 닉네임 변경 API 호출
-      console.log("✅ 닉네임 변경 완료:", updatedUser);
-      setUser((prev) => ({ ...prev, nickname })); // UI 업데이트
-    } catch (err) {
-      console.error("❌ 닉네임 업데이트 실패:", err.response?.data || err.message);
-      alert("닉네임 변경에 실패했습니다.");
-    }
-  };
+  }, [user, navigate, setUser]);
 
   return (
     <div className="flex flex-col items-center mt-10">
@@ -53,20 +32,7 @@ const Profile = () => {
       {user ? (
         <div className="text-center">
           <p className="mb-2">아이디: {user.id}</p>
-          {/* 닉네임 입력 필드 */}
-          <input
-            type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            className="border p-2"
-          />
-          {/* 닉네임 업데이트 버튼 */}
-          <button
-            onClick={handleNicknameUpdate}
-            className="bg-blue-500 text-white p-2 mt-2"
-          >
-            닉네임 변경
-          </button>
+          <p className="mb-2">닉네임: {nickname}</p>
         </div>
       ) : (
         <p>로딩 중...</p>

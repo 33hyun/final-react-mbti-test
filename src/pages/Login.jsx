@@ -1,62 +1,56 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../api/auth"; // 로그인 API 호출 함수 가져오기
+import { login } from "../api/auth";
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
-  // 사용자가 입력한 로그인 정보를 저장하는 상태
-  const [id, setId] = useState(""); // 아이디
-  const [password, setPassword] = useState(""); // 비밀번호
-  const navigate = useNavigate(); // 페이지 이동을 위한 `useNavigate` 사용
+  const { setUser } = useContext(AuthContext);
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  /**
-   * ✅ 로그인 요청 함수
-   * @param {Event} e - 폼 제출 이벤트
-   */
+  /** 로그인 요청 */
   const handleLogin = async (e) => {
-    e.preventDefault(); // 기본 동작(새로고침) 방지
+    e.preventDefault();
     try {
-      // 로그인 API 호출
       const res = await login({ id, password });
 
-      // 로그인 성공 시 accessToken을 localStorage에 저장
+      if (!res.accessToken) {
+        alert("로그인 실패: 토큰을 받아오지 못했습니다.");
+        return;
+      }
+
+      // JWT 토큰 저장 후 로그인 상태 업데이트
       localStorage.setItem("token", res.accessToken);
-
-      // 🔹 로그인 상태 변경 이벤트 발생 (네비게이션 바 업데이트)
-      window.dispatchEvent(new Event("storage"));
-
-      console.log("로그인 성공", res); // 디버깅용 콘솔 로그
-      alert("로그인 성공! 홈페이지로 이동합니다."); // 성공 메시지 표시
-      navigate("/"); // 로그인 성공 후 홈으로 이동
-    } catch (err) {
-      console.error("로그인 실패:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "로그인에 실패했습니다."); // 사용자에게 오류 메시지 표시
+      setUser(res);
+      navigate("/");
+    } catch (error) {
+      alert("로그인 실패");
+      console.error(error);
     }
   };
 
   return (
     <div className="flex flex-col items-center mt-10">
-      <h2 className="text-2xl mb-4">로그인</h2>
-      <form onSubmit={handleLogin} className="flex flex-col gap-2">
-        {/* 아이디 입력 필드 */}
+      <h2 className="text-3xl font-bold mb-4">로그인</h2>
+      <form onSubmit={handleLogin} className="w-full max-w-md flex flex-col gap-4">
         <input
           type="text"
           placeholder="아이디"
           value={id}
           onChange={(e) => setId(e.target.value)}
           required
-          className="border p-2"
+          className="border p-3 rounded w-full"
         />
-        {/* 비밀번호 입력 필드 */}
         <input
           type="password"
           placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="border p-2"
+          className="border p-3 rounded w-full"
         />
-        {/* 로그인 버튼 */}
-        <button type="submit" className="bg-blue-500 text-white p-2">
+        <button type="submit" className="bg-blue-500 text-white py-3 rounded hover:bg-blue-600">
           로그인
         </button>
       </form>
