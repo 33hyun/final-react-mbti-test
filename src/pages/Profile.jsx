@@ -1,43 +1,49 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserProfile, updateProfile } from "../api/auth"; // 프로필 관련 API 함수 가져오기
+import { getUserProfile, updateNickname } from "../api/auth"; // API 함수 가져오기
 
 const Profile = () => {
-  const [user, setUser] = useState(null); // 사용자 정보 상태 관리
-  const [nickname, setNickname] = useState(""); // 닉네임 변경을 위한 상태
+  const [user, setUser] = useState(null); // 사용자 정보 상태
+  const [nickname, setNickname] = useState(""); // 닉네임 변경 상태
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token"); // JWT 토큰 가져오기
+      const token = localStorage.getItem("token"); // 로컬 스토리지에서 JWT 토큰 가져오기
+
       if (!token) {
-        navigate("/login"); // 토큰이 없으면 로그인 페이지로 이동
+        console.warn("❌ 토큰 없음: 로그인 페이지로 이동");
+        navigate("/login");
         return;
       }
+
       try {
-        const res = await getUserProfile(token);
-        setUser(res); // 사용자 정보 저장
+        const res = await getUserProfile(); // API 호출 (토큰은 자동으로 포함됨)
+        setUser(res);
         setNickname(res.nickname); // 기존 닉네임 저장
       } catch (err) {
-        console.error(err.response?.data || err.message);
-        alert("프로필 정보를 불러오는 데 실패했습니다.");
-        navigate("/login");
+        console.error("❌ 프로필 로드 실패:", err.response?.data || err.message);
+        navigate("/login"); // 실패 시 로그인 페이지로 이동
       }
     };
+
     fetchProfile();
   }, [navigate]);
 
-  // 프로필 업데이트 함수
-  const handleProfileUpdate = async () => {
+  // 닉네임 업데이트 함수
+  const handleNicknameUpdate = async () => {
+    if (!nickname.trim()) {
+      alert("닉네임을 입력해주세요.");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
-      const formData = new FormData();
-      formData.append("nickname", nickname); // 닉네임 변경
-      await updateProfile(formData, token);
-      alert("프로필이 업데이트되었습니다.");
+      const updatedUser = await updateNickname({ nickname }); // 닉네임 변경 API 호출
+      console.log("✅ 닉네임 변경 완료:", updatedUser);
+      setUser((prev) => ({ ...prev, nickname })); // UI 업데이트
     } catch (err) {
-      console.error(err.response?.data || err.message);
-      alert("프로필 업데이트 실패");
+      console.error("❌ 닉네임 업데이트 실패:", err.response?.data || err.message);
+      alert("닉네임 변경에 실패했습니다.");
     }
   };
 
@@ -54,9 +60,12 @@ const Profile = () => {
             onChange={(e) => setNickname(e.target.value)}
             className="border p-2"
           />
-          {/* 프로필 업데이트 버튼 */}
-          <button onClick={handleProfileUpdate} className="bg-blue-500 text-white p-2 mt-2">
-            프로필 업데이트
+          {/* 닉네임 업데이트 버튼 */}
+          <button
+            onClick={handleNicknameUpdate}
+            className="bg-blue-500 text-white p-2 mt-2"
+          >
+            닉네임 변경
           </button>
         </div>
       ) : (
