@@ -7,6 +7,7 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import TestPage from "../pages/TestPage";
+import TestResultList from "../pages/TestResultList";
 import ResultPage from "../pages/ResultPage";
 
 const AppRoutes = () => {
@@ -16,11 +17,11 @@ const AppRoutes = () => {
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
-
         <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<Profile />} />
           <Route path="test" element={<TestPage />} />
-          <Route path="result/:id" element={<ResultPage />} />
+          <Route path="results" element={<TestResultList />} />
+          <Route path="result/:id" element={<ResultPage />} /> 
         </Route>
       </Route>
     </Routes>

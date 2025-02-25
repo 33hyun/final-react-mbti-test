@@ -1,57 +1,44 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthContext";
-import TestForm from "../components/TestForm";
 import { calculateMBTI, mbtiDescriptions } from "../utils/calculateMBTI";
 import { createTestResult } from "../api/testResult";
+import TestForm from "../components/TestForm";
 
-const TestPage = () => {
-  const { user } = useContext(AuthContext);
+const TestPage = ({ user }) => {
   const navigate = useNavigate();
   const [result, setResult] = useState(null);
 
-  /** 테스트 결과 제출 */
   const handleTestSubmit = async (answers) => {
-    if (!user || !user.id) {
-      alert("로그인이 필요합니다.");
-      navigate("/login");
-      return;
-    }
-
     const mbtiResult = calculateMBTI(answers);
     setResult(mbtiResult);
 
     try {
-      await createTestResult({
-        userId: user.id,
+      const response = await createTestResult({
+        userId: user?.id,
         mbti: mbtiResult,
         description: mbtiDescriptions[mbtiResult] || "MBTI 설명 없음",
         visibility: true,
       });
+
+      console.log("테스트 결과 저장 완료!", response);
+      navigate(`/result/${response.id}`); // ✅ 결과 페이지로 이동
     } catch (error) {
-      alert("테스트 결과 저장 실패");
-      console.error("에러:", error);
+      console.error("테스트 결과 저장 실패:", error);
     }
   };
 
   return (
-    <div className="flex flex-col items-center mt-10">
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg">
+    <div className="w-full flex flex-col items-center justify-center bg-white">
+      <div className="bg-white rounded-lg p-8 max-w-lg w-full">
         {!result ? (
           <>
-            <h1 className="text-2xl font-bold text-center mb-6">MBTI 테스트</h1>
+            <h1 className="text-3xl font-bold mb-6">MBTI 테스트</h1>
             <TestForm onSubmit={handleTestSubmit} />
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-center mb-6">테스트 결과: {result}</h1>
-            <p className="text-gray-700 text-center">{mbtiDescriptions[result]}</p>
-            <button
-              onClick={() => navigate("/results")}
-              className="mt-6 bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600"
-            >
-              결과 페이지로 이동
-            </button>
+            <h1 className="text-3xl font-bold mb-6">테스트 결과: {result}</h1>
+            <p className="text-lg text-gray-700 mb-6">{mbtiDescriptions[result] || "설명 없음"}</p>
           </>
         )}
       </div>
