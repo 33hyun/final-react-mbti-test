@@ -1,8 +1,13 @@
-# React + Vite
+MBTI 테스트 웹 사이트 만들기
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. 회원가입/로그인
+2. 프로필 수정 및 관리
+3. 테스트 실행 및 결과 확인
+4. JWT 인증 
+5. REST API 통신 
+6. 레이아웃 및 네비게이션
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+이번 프로젝트의 목표
+- **인증 및 권한 관리**를 통해 사용자의 데이터를 안전하게 보호할 수 있습니다.
+- **Axios**와 Tanstack Query(React Query)를 활용하여 비동기 데이터를 효율적으로 관리 할 수 있습니다.
+- **json-server**를 사용해 로컬 환경에서 API 서버를 구축할 수 있습니다.
